@@ -2,13 +2,15 @@ require("dotenv").config();
 const express = require("express");
 const app=express();
 const mongoose=require("mongoose");
-const md5=require("md5");
+const bcrypt=require("bcryptjs");
+const saltRounds=bcrypt.genSaltSync(10);
 
 app.set("view engine","ejs");
 app.use(express.urlencoded({extended:true}));
 app.use(express.static("public"));
 
-mongoose.connect("mongodb://localhost:27017/userDB",{useNewUrlParser: true});
+//mongoose.connect("mongodb://localhost:27017/userDB",{useNewUrlParser: true});
+mongoose.connect("mongodb://127.0.0.1:27017/userDB",{useNewUrlParser: true});
 
 const userSchema=new mongoose.Schema({
     email: String,
@@ -27,13 +29,14 @@ app.get("/login",(req,res)=>{
 
 app.post("/login",(req,res)=>{
     const username=req.body.username;
-    const password=md5(req.body.password);
+    const password=req.body.password;
     User.findOne({email:username},(err,foundUser)=>{
         if(err) {
             console.log(err);
         } else {
             if(foundUser) {
-                if(foundUser.password===password){
+                const match=bcrypt.compareSync(password, foundUser.password);
+                if(match){
                     res.render("secrets");
                 }
             }
@@ -46,9 +49,10 @@ app.get("/register",(req,res)=>{
 });
 
 app.post("/register",(req,res)=>{
+    var hash = bcrypt.hashSync(req.body.password, saltRounds);
     const newUser=new User({
         email: req.body.username,
-        password: md5(req.body.password)
+        password: hash
     });
     newUser.save((err)=>{
         if(err) {
