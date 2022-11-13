@@ -28,7 +28,8 @@ const userSchema=new mongoose.Schema({
     email: String,
     password: String,
     googleId: String,
-    facebookId: String
+    facebookId: String,
+    secret: String
 });
 
 userSchema.plugin(passportLocalMongoose);
@@ -42,7 +43,7 @@ passport.serializeUser((user, cb)=>{
     process.nextTick(()=>{
         return cb(null, {
             id: user.id,
-            username: user.username,
+            username: user.username
         });
     });
 });
@@ -60,7 +61,6 @@ passport.use(new GoogleStrategy({
     callbackURL: "http://localhost:3000/auth/google/secrets"
   },
   function(accessToken, refreshToken, profile, cb) {
-    //console.log(profile);
     User.findOrCreate({ googleId: profile.id }, function (err, user) {
       return cb(err, user);
     });
@@ -74,7 +74,6 @@ passport.use(new FacebookStrategy({
     callbackURL: "http://localhost:3000/auth/facebook/secrets"
   },
   function(accessToken, refreshToken, profile, cb) {
-    //console.log(profile);
     User.findOrCreate({ facebookId: profile.id }, function (err, user) {
       return cb(err, user);
     });
@@ -144,11 +143,15 @@ app.post("/register",(req,res)=>{
 });
 
 app.get("/secrets",(req,res)=>{
-    if(req.isAuthenticated()){
-        res.render("secrets");
-    } else {
-        res.redirect("/login");
-    }
+    User.find({secret:{$ne:null}},(err,foundUsers)=>{
+        if(err){
+            console.log(err);
+        }else{
+            if(foundUsers){
+                res.render("secrets",{usersWithSecrets:foundUsers});
+            }
+        }
+    });
 });
 
 app.get("/logout",(req,res,next)=>{
@@ -157,6 +160,31 @@ app.get("/logout",(req,res,next)=>{
             return next(err);
         } else {
             res.redirect("/");
+        }
+    });
+});
+
+app.get("/submit",(req,res)=>{
+    if(req.isAuthenticated()){
+        res.render("submit");
+    } else {
+        res.redirect("/login");
+    }
+});
+
+app.post("/submit",(req,res)=>{
+    const submittedSecret=req.body.secret;
+    console.log(req.user+"submitted a secret");
+    User.findById(req.user.id,(err,foundUser)=>{
+        if(err){
+            console.log(err);
+        } else {
+            if(foundUser){
+                foundUser.secret=submittedSecret;
+                foundUser.save(()=>{
+                    res.redirect("/secrets");
+                });
+            }
         }
     });
 });
