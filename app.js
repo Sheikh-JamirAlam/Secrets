@@ -21,8 +21,10 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
+const pass=process.env.PASS;
 
-mongoose.connect("mongodb://127.0.0.1:27017/userDB",{useNewUrlParser: true});
+mongoose.connect("mongodb+srv://JamirAlam:${pass}@cluster0.nfv1kwx.mongodb.net/?retryWrites=true&w=majority",{useNewUrlParser: true});
+//mongoose.connect("mongodb://127.0.0.1:27017/userDB",{useNewUrlParser: true});
 
 const userSchema=new mongoose.Schema({
     email: String,
@@ -193,6 +195,8 @@ app.post("/submit",(req,res)=>{
     });
 });
 
-app.listen(3000,()=>{
-    console.log("Server started listening.");
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log("Server listening on port ${PORT}");
 });
