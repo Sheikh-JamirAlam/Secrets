@@ -143,15 +143,19 @@ app.post("/register",(req,res)=>{
 });
 
 app.get("/secrets",(req,res)=>{
-    User.find({secret:{$ne:null}},(err,foundUsers)=>{
-        if(err){
-            console.log(err);
-        }else{
-            if(foundUsers){
-                res.render("secrets",{usersWithSecrets:foundUsers});
+    if(req.isAuthenticated()){
+        User.find({secret:{$ne:null}},(err,foundUsers)=>{
+            if(err){
+                console.log(err);
+            }else{
+                if(foundUsers){
+                    res.render("secrets",{usersWithSecrets:foundUsers});
+                }
             }
-        }
-    });
+        });
+    }else{
+        res.redirect("/login");
+    }
 });
 
 app.get("/logout",(req,res,next)=>{
