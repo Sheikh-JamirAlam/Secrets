@@ -157,7 +157,7 @@ app.get("/secrets",(req,res)=>{
     if(req.isAuthenticated()){
         async function findMain(){
             try{
-                await User.find({secret:{$ne:null}}).then((err,foundUsers)=>{
+                await User.find({secret:{$ne:null}},(err,foundUsers)=>{
                     if(err){
                         console.log(err);
                     }else{
@@ -166,6 +166,8 @@ app.get("/secrets",(req,res)=>{
                         }
                     }
                 });
+                const q = await User.find();
+                await q.clone();
             } catch(err){
                 console.log(err);
             }
