@@ -166,8 +166,6 @@ app.get("/secrets",(req,res)=>{
                         }
                     }
                 });
-                const q = await User.find();
-                await q.clone();
             } catch(err){
                 console.log(err);
             }
