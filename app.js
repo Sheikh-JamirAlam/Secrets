@@ -156,19 +156,19 @@ app.post("/register",(req,res)=>{
 app.get("/secrets",(req,res)=>{
     if(req.isAuthenticated()){
         async function findMain(){
-        try{
-        await User.find({secret:{$ne:null}},(err,foundUsers)=>{
-            if(err){
+            try{
+                await User.find({secret:{$ne:null}}).then((err,foundUsers)=>{
+                    if(err){
+                        console.log(err);
+                    }else{
+                        if(foundUsers){
+                            res.render("secrets",{usersWithSecrets:foundUsers});
+                        }
+                    }
+                });
+            } catch(err){
                 console.log(err);
-            }else{
-                if(foundUsers){
-                    res.render("secrets",{usersWithSecrets:foundUsers});
-                }
             }
-        });
-        } catch(err){
-            console.log(err);
-        }
         }
         findMain();
     }else{
