@@ -8,6 +8,7 @@ const passportLocalMongoose=require("passport-local-mongoose");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const findOrCreate = require("mongoose-findorcreate");
+const { migrations } = require("mongoose-encryption");
 
 app.set("view engine","ejs");
 app.use(express.urlencoded({extended:true}));
@@ -23,8 +24,12 @@ app.use(passport.initialize());
 app.use(passport.session());
 const pass=process.env.PASS;
 
-mongoose.connect("mongodb+srv://JamirAlam:${pass}@cluster0.nfv1kwx.mongodb.net/?retryWrites=true&w=majority",{useNewUrlParser: true});
-//mongoose.connect("mongodb://127.0.0.1:27017/userDB",{useNewUrlParser: true});
+async function main(){
+    await mongoose.connect("mongodb+srv://JamirAlam:${pass}@cluster0.nfv1kwx.mongodb.net/?retryWrites=true&w=majority",{useNewUrlParser: true});
+    //mongoose.connect("mongodb://127.0.0.1:27017/userDB",{useNewUrlParser: true});
+}
+
+main();
 
 const userSchema=new mongoose.Schema({
     email: String,
@@ -146,7 +151,8 @@ app.post("/register",(req,res)=>{
 
 app.get("/secrets",(req,res)=>{
     if(req.isAuthenticated()){
-        User.find({secret:{$ne:null}},(err,foundUsers)=>{
+        async function findMain(){
+        await User.find({secret:{$ne:null}},(err,foundUsers)=>{
             if(err){
                 console.log(err);
             }else{
@@ -155,6 +161,8 @@ app.get("/secrets",(req,res)=>{
                 }
             }
         });
+        }
+        findMain();
     }else{
         res.redirect("/login");
     }
