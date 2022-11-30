@@ -164,6 +164,9 @@ body .curve-svg{
   height: 60px;
   margin: 0 20px;
 }
+.discovered-h1{
+  margin-bottom: 2rem;
+}
 .secrets-button-container{
   margin: 0 20%;
   display: flex;
@@ -226,4 +229,18 @@ input.submit-textbox{
   margin: 0 auto;
   width: 50%;
   height: 60px;
+}
+@media(width<=500px) {
+  .secrets-button-container {
+    margin: 0;
+  }
+  .submit-text{
+    padding: 0;
+  }
+  input.submit-textbox {
+    width: 100%;
+  }
+  .submit-form{
+    width: 100%;
+  }
 }
