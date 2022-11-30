@@ -25,7 +25,11 @@ app.use(passport.session());
 const pass=process.env.PASS;
 
 async function main(){
-    await mongoose.connect("mongodb+srv://JamirAlam:${pass}@cluster0.nfv1kwx.mongodb.net/?retryWrites=true&w=majority",{useNewUrlParser: true});
+    try{
+        await mongoose.connect("mongodb+srv://JamirAlam:"+pass+"@cluster0.nfv1kwx.mongodb.net/?retryWrites=true&w=majority",{useNewUrlParser: true});
+    } catch(err){
+        console.log(err);
+    }
     //mongoose.connect("mongodb://127.0.0.1:27017/userDB",{useNewUrlParser: true});
 }
 
@@ -152,6 +156,7 @@ app.post("/register",(req,res)=>{
 app.get("/secrets",(req,res)=>{
     if(req.isAuthenticated()){
         async function findMain(){
+        try{
         await User.find({secret:{$ne:null}},(err,foundUsers)=>{
             if(err){
                 console.log(err);
@@ -161,6 +166,9 @@ app.get("/secrets",(req,res)=>{
                 }
             }
         });
+        } catch(err){
+            console.log(err);
+        }
         }
         findMain();
     }else{
@@ -206,5 +214,5 @@ app.post("/submit",(req,res)=>{
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-    console.log("Server listening on port ${PORT}");
+    console.log("Server listening on port "+PORT);
 });
