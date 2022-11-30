@@ -27,10 +27,10 @@ const pass=process.env.PASS;
 async function main(){
     try{
         await mongoose.connect("mongodb+srv://JamirAlam:"+pass+"@cluster0.nfv1kwx.mongodb.net/?retryWrites=true&w=majority",{useNewUrlParser: true});
+        //await mongoose.connect("mongodb://127.0.0.1:27017/userDB",{useNewUrlParser: true});
     } catch(err){
         console.log(err);
     }
-    //mongoose.connect("mongodb://127.0.0.1:27017/userDB",{useNewUrlParser: true});
 }
 
 main();
@@ -157,15 +157,10 @@ app.get("/secrets",(req,res)=>{
     if(req.isAuthenticated()){
         async function findMain(){
             try{
-                await User.find({secret:{$ne:null}},(err,foundUsers)=>{
-                    if(err){
-                        console.log(err);
-                    }else{
-                        if(foundUsers){
-                            res.render("secrets",{usersWithSecrets:foundUsers});
-                        }
-                    }
-                });
+                const foundUsers=await User.find({secret:{$ne:null}});
+                if(foundUsers!=null){
+                    res.render("secrets",{usersWithSecrets:foundUsers});
+                }
             } catch(err){
                 console.log(err);
             }
