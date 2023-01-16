@@ -23,10 +23,11 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 const pass=process.env.PASS;
+const username=process.env.USER;
 
 async function main(){
     try{
-        await mongoose.connect("mongodb+srv://JamirAlam:"+pass+"@cluster0.nfv1kwx.mongodb.net/?retryWrites=true&w=majority",{useNewUrlParser: true});
+        await mongoose.connect("mongodb+srv://"+username+":"+pass+"@cluster0.nfv1kwx.mongodb.net/?retryWrites=true&w=majority",{useNewUrlParser: true});
         //await mongoose.connect("mongodb://127.0.0.1:27017/userDB",{useNewUrlParser: true});
     } catch(err){
         console.log(err);
